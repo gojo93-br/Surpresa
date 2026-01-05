@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zanela Cortes | Universo Oficial</title>
+    
+    <!-- Fontes Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-color: #ffffff;
+            --primary: #8a2be2; /* Roxo Neon */
+            --secondary: #ff007f; /* Rosa Choque */
+            --accent: #00f2ea; /* Ciano Elétrico */
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- Background Particles --- */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a0b2e 0%, #000000 100%);
+        }
+
+        /* --- Tipografia --- */
+        h1, h2, h3 {
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            text-transform: uppercase;
+        }
+
+        .highlight-text {
+            background: linear-gradient(90deg, var(--secondary), var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* --- Login Screen --- */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .login-card {
+            text-align: center;
+            padding: 3rem;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(138, 43, 226, 0.2);
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 6s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .login-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: #aaa;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .password-input-group {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .password-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 0, 127, 0.4);
+        }
+
+        .error-msg {
+            color: #ff4d4d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            min-height: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* --- Main Content Structure --- */
+        #main-content {
+            opacity: 0; /* Hidden initially */
+            visibility: hidden;
+            transition: opacity 1s ease;
+        }
+
+        section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* --- Animations --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Header / Nav --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: white;
+            text-decoration: none;
+        }
+
+        .music-control {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .music-control:hover {
+            background: var(--primary);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            color: #ccc;
+            margin-bottom: 2rem;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+
+        /* --- Cards Style --- */
+        .glass-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: var(--transition);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(138, 43, 226, 0.2);
+        }
+
+        /* --- Grid Layouts --- */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            justify-content: center; /* ALTERAÇÃO: Centraliza as colunas na tela */
+        }
+
+        /* --- Specific Sections --- */
+        
+        /* Frases Marcantes */
+        .quote-card {
+            text-align: center;
+            position: relative;
+        }
+        .quote-card i {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        .quote-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-style: italic;
+        }
+
+        /* --- Video Gallery Styles (LINKED) --- */
+        /* O link (<a>) envolve o card inteiro */
+        .video-link {
+            text-decoration: none;
+            color: inherit;
+            display: block; 
+        }
+
+        .video-card {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            cursor: pointer;
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+            background: #0f0f0f;
+        }
+
+        /* Efeito no link (card pai) */
+        .video-link:hover .video-card {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--primary);
+            z-index: 2;
+            border-color: var(--accent);
+        }
+
+        .video-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .video-link:hover .video-card img {
+            transform: scale(1.1);
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5); /* Um pouco mais escuro no hover */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .video-link:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .play-icon {
+            font-size: 4rem;
+            color: white;
+            text-shadow: 0 0 20px rgba(255,255,255,0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .video-link:hover .play-icon {
+            transform: scale(1.2);
+        }
+
+        .video-title {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .video-stats {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        /* Galeria (Imagens) */
+        .gallery-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            cursor: pointer;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(to top, black, transparent);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        /* --- Birthday Section --- */
+        .birthday-section {
+            text-align: center;
+            padding: 8rem 2rem;
+            background: linear-gradient(180deg, transparent, rgba(138, 43, 226, 0.1), transparent);
+        }
+
+        .birthday-card {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid rgba(255, 192, 203, 0.3);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .birthday-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            line-height: 2;
+            color: #f0f0f0;
+            white-space: pre-line; /* Preserva quebras de linha */
+        }
+
+        .heart-icon {
+            color: var(--secondary);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--glass-border);
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* --- Mobile Responsive --- */
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 3rem;
+            }
+            section {
+                padding: 4rem 1.5rem;
+            }
+        }
+
+        /* --- Audio Visualizer (Fake Animation) --- */
+        .equalizer {
+            display: flex;
+            gap: 2px;
+            height: 15px;
+            align-items: flex-end;
+        }
+        .bar {
+            width: 3px;
+            background: white;
+            animation: equalize 1s infinite;
+        }
+        .bar:nth-child(1) { animation-delay: 0.1s; }
+        .bar:nth-child(2) { animation-delay: 0.3s; }
+        .bar:nth-child(3) { animation-delay: 0.5s; }
+        .bar:nth-child(4) { animation-delay: 0.2s; }
+
+        @keyframes equalize {
+            0%, 100% { height: 2px; }
+            50% { height: 100%; }
+        }
+        
+        .paused .bar {
+            animation-play-state: paused;
+            height: 2px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Particles -->
+    <div id="particles-js"></div>
+
+    <!-- AUDIO PLAYER -->
+    <audio id="bg-music" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112778.mp3" type="audio/mpeg">
+        Seu navegador não suporta áudio.
+    </audio>
+
+    <!-- TELA DE LOGIN -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <h1 class="login-title highlight-text">ZANELLA CORTES</h1>
+            <p class="login-subtitle">Bem-vindo ao universo Zanela Cortes<br>Conteúdo especial. Acesso protegido.</p>
+            
+            <div class="password-input-group">
+                <input type="password" id="password" class="password-input" placeholder="Digite a senha..." onkeypress="checkEnter(event)">
+            </div>
+            
+            <button class="login-btn" onclick="validatePassword()">Entrar</button>
+            
+            <div id="error-msg" class="error-msg">Senha incorreta. Tente novamente.</div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div id="main-content">
+        
+        <!-- Header -->
+        <header>
+            <a href="#" class="logo">ZANELLA<span style="color:var(--secondary)">.</span></a>
+            <div class="music-control paused" id="music-btn" onclick="toggleMusic()">
+                <div class="equalizer">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+                <span id="music-text">Música OFF</span>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1 class="reveal">O Universo<br><span class="highlight-text">Zanela Cortes</span></h1>
+            <p class="reveal">Humor autêntico, cortes precisos e conexão real.</p>
+            <div class="scroll-indicator reveal">
+                <i class="fa-solid fa-chevron-down fa-2x" style="color: var(--glass-border);"></i>
+            </div>
+        </section>
+
+        <!-- Seção 1: QUEM É ZANELLA (EXPANDIDA) -->
+        <section id="quem-e">
+            <div class="grid-2">
+                <div class="glass-card reveal">
+                    <!-- Imagem de perfil abstrata ou do criador -->
+                    <img src="ab67616100005174d60f0043f398297da33b4a81.jpg" alt="Zanela Cortes" style="width:100%; border-radius:10px; opacity: 0.9; filter: grayscale(20%);">
+                </div>
+                <div class="reveal" style="display: flex; flex-direction: column; justify-content: center;">
+                    <h2 style="margin-bottom: 1rem;">Quem é <span class="highlight-text">Zanella</span></h2>
+                    <p style="margin-bottom: 1rem; color: #ccc;">
+                        <strong>Zanela Cortes</strong> transcende a figura de um simples youtuber. Ele é um criador de tendências, um mestre da edição rápida e um comunicador nato. Conhecido por seu humor "brega cult" e pela sinceridade nas opiniões, Zanela construiu uma comunidade fiel que não apenas assiste, mas participa.
+                    </p>
+                    <p style="color: #aaa;">
+                        O diferencial está no <em>jeitinho</em>: misturar o caos da internet com momentos de pura humanidade. Seja narrando um jogo, debatendo o cenário pop ou contando histórias pessoais, a autenticidade é a marca registrada. Ele prova que não precisa ser sério para ser levado a sério.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 2: OS CLÁSSICOS (VÍDEOS FAMOSOS COM LINKS) -->
+        <section id="videos-famosos">
+            <div style="text-align: center; margin-bottom: 3rem;" class="reveal">
+                <i class="fa-brands fa-youtube fa-2x" style="color: #ff0000; margin-bottom: 10px;"></i>
+                <h2>Vídeos <span class="highlight-text">Icônicos</span></h2>
+                <p style="color: #888;">Os momentos que marcaram a história do canal</p>
+            </div>
+
+            <div class="grid-3">
+                
+                <!-- LINKS DOS VÍDEOS - EDITE AQUI -->
+                <!-- Substitua o href="#" pelo link real do YouTube (ex: https://www.youtube.com/watch?v=XXXXX) -->
+                
+                <!-- Video 1 -->
+                <a href="https://www.youtube.com/watch?v=kaLmD_zi72k" target="_blank" class="video-link reveal">
+                    <div class="video-card">
+                        <img src="hqdefault.jpg" alt="Video Thumbnail">
+                        <div class="play-overlay">
+                            <i class="fa-solid fa-play play-icon"></i>
+                        </div>
+                    </div>
+                    <div style="padding: 1rem;">
+                        <div class="video-title">😱O Zanella Está de Volta🔥</div>
+                        <div class="video-stats">1.2M views • Há 2 anos</div>
+                    </div>
+                </a>
+
+                <!-- Video 2 -->
+                <a href="" target="_blank" class="video-link reveal">
+                    <div class="video-card">
+                        <img src="2.jpg"Video Thumbnail">
+                        <div class="play-overlay">
+                            <i class="fa-solid fa-play play-icon"></i>
+                        </div>
+                    </div>
+                    <div style="padding: 1rem;">
+                        <div class="video-title">
+😳 Zanella Revela TUDO Sobre o Canal Ao Vivo! 🚨👀</div>
+                        <div class="video-stats">850K views • Há 6 meses</div>
+                    </div>
+                </a>
+
+                <!-- Video 3 -->
+                <a href="https://www.youtube.com/watch?v=A2C0wjfp3_Q" target="_blank" class="video-link reveal">
+                    <div class="video-card">
+                        <img src="3.jpg" alt="Video Thumbnail">
+                        <div class="play-overlay">
+                            <i class="fa-solid fa-play play-icon"></i>
+                        </div>
+                    </div>
+                    <div style="padding: 1rem;">
+                        <div class="video-title">😱 LAVÍNIA LIGOU PARA ZANELLA AO VIVO!!</div>
+                        <div class="video-stats">2.5M views • Mais visto</div>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- Seção 3: O Canal -->
+        <section id="o-canal">
+            <div class="glass-card reveal" style="text-align: center; border-color: var(--accent);">
+                <h2 class="highlight-text">O Canal Zanela Cortes</h2>
+                <br>
+                <p style="max-width: 800px; margin: 0 auto 2rem auto;">
+                    Um espaço dedicado ao entretenimento de alta qualidade. O canal se destaca pela edição dinâmica, os famosos "cortes" virais e uma frequência de postagem que mantém o público sempre engajado.
+                </p>
+                <div class="grid-3">
+                    <div>
+                        <i class="fa-solid fa-video fa-2x" style="color: var(--accent); margin-bottom: 1rem;"></i>
+                        <h3>Conteúdo Dinâmico</h3>
+                        <p style="font-size: 0.9rem; color: #888;">Edições rápidas e objetivas.</p>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-users fa-2x" style="color: var(--secondary); margin-bottom: 1rem;"></i>
+                        <h3>Comunidade Ativa</h3>
+                        <p style="font-size: 0.9rem; color: #888;">Interação constante com os fãs.</p>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-fire fa-2x" style="color: var(--primary); margin-bottom: 1rem;"></i>
+                        <h3>Tendências</h3>
+                        <p style="font-size: 0.9rem; color: #888;">Sempre atualizado com o que acontece.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 4: História -->
+        <section id="historia">
+            <div class="reveal" style="text-align: center; margin-bottom: 3rem;">
+                <h2>História e <span class="highlight-text">Evolução</span></h2>
+            </div>
+            <div class="grid-3">
+                <div class="glass-card reveal">
+                    <h3 style="color: var(--primary)">O Início</h3>
+                    <p style="font-size: 0.9rem; margin-top: 10px; color: #ccc;">
+                        Tudo começou com uma ideia simples e muita vontade de criar. Os primeiros vídeos já mostravam o potencial único de humor e edição.
+                    </p>
+                </div>
+                <div class="glass-card reveal" style="transition-delay: 0.1s;">
+                    <h3 style="color: var(--secondary)">Crescimento</h3>
+                    <p style="font-size: 0.9rem; margin-top: 10px; color: #ccc;">
+                        Com dedicação diária, o canal explodiu. Cada milestone foi uma conquista celebrada junto com quem realmente importa: vocês.
+                    </p>
+                </div>
+                <div class="glass-card reveal" style="transition-delay: 0.2s;">
+                    <h3 style="color: var(--accent)">O Impacto</h3>
+                    <p style="font-size: 0.9rem; margin-top: 10px; color: #ccc;">
+                        Hoje, o Zanela Cortes é referência de estilo e entretenimento, influenciando uma nova geração de criadores e espectadores.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 5: Frases Marcantes -->
+        <section id="frases">
+            <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">Momentos Icônicos</h2>
+            <div class="grid-3">
+                <div class="glass-card quote-card reveal">
+                    <i class="fa-solid fa-quote-left"></i>
+                    <p class="quote-text">"Isso é o topo!"</p>
+                </div>
+                <div class="glass-card quote-card reveal" style="transition-delay: 0.1s;">
+                    <i class="fa-solid fa-quote-left"></i>
+                    <p class="quote-text">"Não tem erro."</p>
+                </div>
+                <div class="glass-card quote-card reveal" style="transition-delay: 0.2s;">
+                    <i class="fa-solid fa-quote-left"></i>
+                    <p class="quote-text">"É o Zanela na área!"</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 6: Galeria (Imagens) -->
+        <section id="galeria">
+            <h2 class="reveal" style="text-align: center; margin-bottom: 3rem;">Galeria <span class="highlight-text">Visual</span></h2>
+            <div class="grid-3">
+                <div class="gallery-item reveal">
+                    <img src="4.jpg" alt="Thumbnail">
+                    <div class="gallery-overlay">
+                        <h4>Momento Épico</h4>
+                    </div>
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="5.jpg" alt="Thumbnail">
+                    <div class="gallery-overlay">
+                        <h4>Bastidores</h4>
+                    </div>
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="6.jpg" alt="Thumbnail">
+                    <div class="gallery-overlay">
+                        <h4>Community Post</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 7: Por que é especial -->
+        <section id="especial">
+            <div class="glass-card reveal" style="text-align: center; border-color: var(--primary);">
+                <i class="fa-solid fa-heart fa-3x" style="color: var(--secondary); margin-bottom: 1rem;"></i>
+                <h2>Por que o Zanela é Especial?</h2>
+                <p style="max-width: 700px; margin: 1rem auto; color: #ddd;">
+                    Em um mundo cheio de cópias, o Zanela é original. Sua capacidade de transformar momentos simples em memórias inesquecíveis é o que diferencia o canal. Não é apenas sobre assistir vídeos, é sobre fazer parte de um movimento.
+                </p>
+            </div>
+        </section>
+
+        <!-- Seção Final: Aniversário -->
+        <section id="aniversario" class="birthday-section">
+            <div class="glass-card birthday-card reveal">
+                <i class="fa-solid fa-seedling heart-icon fa-2x" style="margin-bottom: 1.5rem;"></i>
+                <h2 style="font-family: 'Playfair Display', serif; font-weight: 400; font-size: 2rem; margin-bottom: 2rem;">Uma mensagem especial</h2>
+                
+                <p class="birthday-text">
+                    juuu, feliz aniversário! ✨🎂
+                    que o universo sorria pra você com a mesma intensidade que você faz o mundo ficar mais leve. você é luz, é abraço, é risada que contagia e eu sou muito grata por ter você perto.
+
+                    que o seu novo ano venha cheio de coisas boas: dias tranquilos, sonhos realizados, pessoas que te cuidem com carinho e momentos que enchem o coração. você merece tudo isso e muito mais, porque é incrível, generosa e dona de um jeitinho que encanta.
+
+                    obrigada por cada conversa, cada companhia, cada lembrança que já dividimos. espero continuar criando muitas outras ao seu lado.
+
+                    feliz vida, ju. 🌻
+                    que seja doce, leve e linda assim como você.
+                </p>
+                
+                <div style="margin-top: 3rem; font-size: 3rem;">
+                    🎂 🎈 🎁
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2024 Fan Site Oficial Zanela Cortes. Feito com admiração.</p>
+        </footer>
+
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // --- 1. Password Logic ---
+        function checkEnter(event) {
+            if (event.key === "Enter") {
+                validatePassword();
+            }
+        }
+
+        function validatePassword() {
+            const passInput = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+            const overlay = document.getElementById('login-overlay');
+            const mainContent = document.getElementById('main-content');
+
+            if (passInput === '161024') {
+                // Success Animation
+                errorMsg.style.opacity = '0';
+                overlay.style.opacity = '0';
+                overlay.style.visibility = 'hidden';
+                
+                // Show Content
+                mainContent.style.visibility = 'visible';
+                mainContent.style.opacity = '1';
+
+            } else {
+                // Error Animation
+                errorMsg.style.opacity = '1';
+                const card = document.querySelector('.login-card');
+                card.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    card.style.animation = 'none';
+                }, 500);
+            }
+        }
+
+        // Add shake animation style dynamically
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes shake {
+                0% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                50% { transform: translateX(10px); }
+                75% { transform: translateX(-10px); }
+                100% { transform: translateX(0); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
+
+        // --- 2. Particles.js Config ---
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": ["#8a2be2", "#ff007f", "#ffffff"] },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" } },
+                "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 0.6 } } }
+            },
+            "retina_detect": true
+        });
+
+
+        // --- 3. Scroll Reveal Animation ---
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        // Trigger once on load
+        reveal();
+
+
+        // --- 4. Audio Player Logic ---
+        const audio = document.getElementById('bg-music');
+        const musicBtn = document.getElementById('music-btn');
+        const musicText = document.getElementById('music-text');
+        let isPlaying = false;
+
+        function toggleMusic() {
+            if (isPlaying) {
+                audio.pause();
+                musicBtn.classList.add('paused');
+                musicText.textContent = "Música OFF";
+            } else {
+                audio.play().then(() => {
+                    musicBtn.classList.remove('paused');
+                    musicText.textContent = "Música ON";
+                }).catch(e => {
+                    console.log("Audio play blocked until user interaction");
+                });
+            }
+            isPlaying = !isPlaying;
+        }
+    </script>
+</body>
+</html>
